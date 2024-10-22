@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import pydeck
+from datetime import datetime
 
 #@st.cache_data
 def cargar_contagios():
@@ -39,8 +40,21 @@ with tab1:
 with tab2:
     # Gráfico de contagios por fecha
 
-    df_contagios_fecha = df_join.groupby(['fecha_diagnostico']).count()['id_de_caso']
     with st.container(border=True):
+        fecha1 = datetime.strptime(df_join['fecha_diagnostico'].min(), '%Y-%m-%d')
+        fecha2 = datetime.strptime(df_join['fecha_diagnostico'].max(), '%Y-%m-%d')
+        slider_fechas = st.slider(
+            "Seleccione un rango de fechas", 
+            min_value=fecha1, 
+            max_value=fecha2, 
+            value=(fecha1, fecha2)
+        )
+        valor1 = slider_fechas[0].strftime('%Y-%m-%d')
+        valor2 = slider_fechas[1].strftime('%Y-%m-%d')
+        df_filtro_contagio_fecha = df_join[(df_join['fecha_diagnostico'] >= valor1) & (df_join['fecha_diagnostico'] <= valor2)]
+
+        df_contagios_fecha = df_filtro_contagio_fecha.groupby(['fecha_diagnostico']).count()['id_de_caso']
+        
         st.header('Contagios x Fecha')
         st.line_chart(df_contagios_fecha, x_label='Fecha', y_label='Cantidad')
 
