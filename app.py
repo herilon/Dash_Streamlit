@@ -23,7 +23,9 @@ df_join['fecha_muerte'] = df_join['fecha_muerte'].str[:10]
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Datos", "Lineas", "Barras", "Mapa", "Circular", "Histograma"])
 
 with tab1:
-    st.write(df_join)
+    ver_df = st.toggle('Ver DataFrame', value=True)
+    if ver_df:
+        st.write(df_join)
 
     #KPI
     confirmados = df_join.id_de_caso.count()
