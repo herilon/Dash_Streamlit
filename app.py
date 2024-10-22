@@ -54,15 +54,30 @@ with tab2:
         df_filtro_contagio_fecha = df_join[(df_join['fecha_diagnostico'] >= valor1) & (df_join['fecha_diagnostico'] <= valor2)]
 
         df_contagios_fecha = df_filtro_contagio_fecha.groupby(['fecha_diagnostico']).count()['id_de_caso']
-        
+
         st.header('Contagios x Fecha')
         st.line_chart(df_contagios_fecha, x_label='Fecha', y_label='Cantidad')
 
     # Gráfico de fallecidos por fecha
 
-    df_fallecidos = df_join[df_join['recuperado'] == 'Fallecido']
-    df_fallecidos_fecha = df_fallecidos.groupby(['fecha_muerte']).count()['id_de_caso']
     with st.container(border=True):
+
+        df_fallecidos = df_join[df_join['recuperado'] == 'Fallecido']
+
+        opciones = df_fallecidos['fecha_muerte'].sort_values().unique()
+        fecha1m = df_fallecidos['fecha_muerte'].min()
+        fecha2m = df_fallecidos['fecha_muerte'].max()
+        slider_fechas_fallecidos = st.select_slider(
+            "Seleccione un rango de fechas", 
+            options=opciones,
+            value=(fecha1m, fecha2m)
+        )
+        valor1m = slider_fechas_fallecidos[0]
+        valor2m = slider_fechas_fallecidos[1]
+        df_filtro_fallecidos_fecha = df_fallecidos[(df_fallecidos['fecha_muerte'] >= valor1m) & (df_fallecidos['fecha_muerte'] <= valor2m)]
+
+        df_fallecidos_fecha = df_filtro_fallecidos_fecha.groupby(['fecha_muerte']).count()['id_de_caso']
+        
         st.header('Fallecidos x Fecha')
         fig, ax = plt.subplots()
         ax.plot(df_fallecidos_fecha)
