@@ -77,7 +77,7 @@ with tab2:
         df_filtro_fallecidos_fecha = df_fallecidos[(df_fallecidos['fecha_muerte'] >= valor1m) & (df_fallecidos['fecha_muerte'] <= valor2m)]
 
         df_fallecidos_fecha = df_filtro_fallecidos_fecha.groupby(['fecha_muerte']).count()['id_de_caso']
-        
+
         st.header('Fallecidos x Fecha')
         fig, ax = plt.subplots()
         ax.plot(df_fallecidos_fecha)
@@ -90,8 +90,20 @@ with tab2:
 with tab3:
     # Contagios por departamento
 
-    df_contagios_departamento = df_join.groupby(['departamento_nom']).count()['id_de_caso']
     with st.container(border=True):
+
+        departamentos = st.multiselect(
+            "Seleccione los departamentos",
+            df_join['departamento_nom'].sort_values().unique(),
+            placeholder="Seleccione departamentos"
+        )
+
+        if len(departamentos) == 0:
+            df_contagios_departamento = df_join.groupby(['departamento_nom']).count()['id_de_caso']
+        else:
+            df_filtro_departamentos = df_join[df_join['departamento_nom'].isin(departamentos)]
+            df_contagios_departamento = df_filtro_departamentos.groupby(['departamento_nom']).count()['id_de_caso']
+
         st.header('Contagios x Departamento')
         st.bar_chart(df_contagios_departamento)
 
