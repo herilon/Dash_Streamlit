@@ -153,7 +153,17 @@ with tab4:
 with tab5:
     # Grafico de contagios por sexo
 
-    df_contagios_sexo = df_join.groupby(['sexo']).id_de_caso.count()
+    lista_departamento=df_join['departamento_nom'].sort_values().unique().tolist()
+    lista_departamento.insert(0, 'Todos')
+    option=st.selectbox(
+        'Seleccione el departamento',
+        lista_departamento
+    )
+    if option == 'Todos':
+        df_contagios_sexo=df_join.groupby(['sexo']).id_de_caso.count()
+    else:
+        df_contagios_sexo=df_join[df_join['departamento_nom']==option].groupby(['sexo']).id_de_caso.count()
+
     fig, ax = plt.subplots()
     ax.pie(df_contagios_sexo, labels=df_contagios_sexo.index, autopct='%1.1f%%')
     with st.container(border=True):
